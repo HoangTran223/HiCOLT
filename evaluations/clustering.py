@@ -1,0 +1,38 @@
+import numpy as np
+from collections import defaultdict
+from sklearn import metrics
+
+def purity_score(y_true, y_pred):
+    contingency_matrix = metrics.cluster.contingency_matrix(y_true, y_pred)
+    return np.sum(np.amax(contingency_matrix, axis=0)) / np.sum(contingency_matrix)
+
+def clustering_metric(labels, preds):
+    metrics_func = [
+        {
+            'name': 'Purity',
+            'method': purity_score
+        },
+        {
+            'name': 'NMI',
+            'method': metrics.cluster.normalized_mutual_info_score
+        },
+    ]
+
+    results = dict()
+    for func in metrics_func:
+        results[func['name']] = func['method'](labels, preds)
+
+    return results
+
+def evaluate_clustering(theta, labels):
+    preds = np.argmax(theta, axis=1)
+    
+    # Debug information
+    # print(f"Theta shape: {theta.shape}")
+    # print(f"Labels shape: {labels.shape}")
+    # print(f"Unique predicted clusters: {len(np.unique(preds))}")
+    # print(f"Unique true labels: {len(np.unique(labels))}")
+    # print(f"Predicted cluster distribution: {np.bincount(preds)}")
+    # print(f"True label distribution: {np.bincount(labels)}")
+    
+    return clustering_metric(labels, preds)

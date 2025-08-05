@@ -1,0 +1,9 @@
+numpy==1.26.4
+torch==2.4.0
+torchvision==0.19.0
+torchaudio==2.4.0
+torch_kmeans==0.2.0
+pytorch==2.2.0
+scipy==1.10
+sentence_transformers==2.2.2
+gensim==4.2.0
