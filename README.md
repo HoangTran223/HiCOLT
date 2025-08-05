@@ -34,11 +34,13 @@
   
 - **Hierarchical Clustering Algorithms**:  
   - Set `method_CL` to one of the following:
+
     - `HAC` (Hierarchical Agglomerative Clustering)
     - `HDBSCAN` (Hierarchical Density-Based Spatial Clustering of Applications with Noise)
 
 - **Distance Metrics for Contrastive Learning**:  
   - Set `metric_CL` to one of the following:
+
     - `euclidean`
     - `cosine`
 
@@ -48,6 +50,7 @@
 
 - **Contrastive Loss Function**:  
   - Set `contrastive_loss_type` to one of the following types:
+  
     - `triplet`
     - `circle`
     - `infonce`
