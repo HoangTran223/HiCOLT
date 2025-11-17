@@ -57,7 +57,7 @@ if __name__ == "__main__":
         read_labels = False
     print(f"read labels = {read_labels}")
 
-    contextual_needed = args.model in ["CombinedTM", "CombinedTM_Plus", "ECRTM_Plus", "NeuroMax_Plus", "ETM_Plus", "FASTopic_Plus"]
+    contextual_needed = args.model in ["CombinedTM", "CombinedTM_Plus", "NeuroMax_Plus", "FASTopic_Plus"]
 
     dataset = datasethandler.BasicDatasetHandler(
         os.path.join(DATA_DIR, args.dataset), device=args.device, read_labels=read_labels,
@@ -249,6 +249,9 @@ if __name__ == "__main__":
     top_words_25 = trainer.save_top_words(
         dataset.vocab, 25, current_run_dir)
 
+    # Save cluster information for models that support it
+    cluster_info_10 = trainer.save_cluster_info(dataset.vocab, 10, current_run_dir)
+
     train_theta_argmax = train_theta.argmax(axis=1)
     test_theta_argmax = test_theta.argmax(axis=1)    
 
@@ -299,6 +302,19 @@ if __name__ == "__main__":
         f.write(f"TC_15: {TC_15:.5f}\n")
         # f.write(f"Accuracy: {classification_results['acc']:.5f}\n")
         # f.write(f"Macro-f1: {classification_results['macro-F1']:.5f}\n")
+        
+        # Add cluster information if available
+        if cluster_info_10 is not None:
+            f.write("\n" + "="*60 + "\n")
+            f.write("CLUSTER INFORMATION (Top 10 words per topic)\n")
+            f.write("="*60 + "\n\n")
+            for cluster_idx in sorted(cluster_info_10.keys()):
+                topics_list = cluster_info_10[cluster_idx]
+                f.write(f"Cluster {cluster_idx}:\n")
+                for topic_idx, top_words in topics_list:
+                    words_str = ', '.join(top_words)
+                    f.write(f"  - Topic {topic_idx}: {words_str}\n")
+                f.write("\n")
     print(f"Done in {filepath}")
 
 

@@ -231,3 +231,28 @@ class BasicTrainer:
                 np.save(os.path.join(dir_path, 'topic_dist.npy'), topic_dist)
 
         return word_embeddings, topic_embeddings
+
+    def save_cluster_info(self, vocab, num_top_words, dir_path):
+        """
+        Save cluster information with topics and their top words to a file.
+        Only works for models that have get_cluster_topics_info method.
+        """
+        if not hasattr(self.model, 'get_cluster_topics_info'):
+            return None
+        
+        cluster_info = self.model.get_cluster_topics_info(vocab, num_top_words)
+        
+        if cluster_info is None:
+            return None
+        
+        filepath = os.path.join(dir_path, f'cluster_topics_{num_top_words}.txt')
+        with open(filepath, 'w') as f:
+            for cluster_idx in sorted(cluster_info.keys()):
+                topics_list = cluster_info[cluster_idx]
+                f.write(f"Cluster {cluster_idx}:\n")
+                for topic_idx, top_words in topics_list:
+                    words_str = ', '.join(top_words)
+                    f.write(f"  - Topic {topic_idx}: {words_str}\n")
+                f.write("\n")
+        
+        return cluster_info

@@ -202,6 +202,33 @@ class CombinedTM_Plus(CombinedTM):
     def pairwise_euclidean_distance(self, x, y):
         return torch.sum(x ** 2, dim=1, keepdim=True) + torch.sum(y ** 2, dim=1) - 2 * torch.matmul(x, y.t())
 
+    def get_cluster_topics_info(self, vocab, num_top_words=10):
+        """
+        Export cluster information with topics and their top words.
+        Returns a dictionary mapping cluster_id to list of (topic_id, top_words).
+        """
+        if self.group_topic is None:
+            return None
+        
+        beta = self.get_beta().detach().cpu().numpy()
+        cluster_info = {}
+        
+        for cluster_idx, topic_indices in enumerate(self.group_topic):
+            if len(topic_indices) == 0:
+                continue
+            
+            cluster_topics = []
+            for topic_idx in topic_indices:
+                # Get top words for this topic
+                topic_beta = beta[topic_idx]
+                top_word_indices = np.argsort(topic_beta)[::-1][:num_top_words]
+                top_words = [vocab[idx] for idx in top_word_indices]
+                cluster_topics.append((topic_idx, top_words))
+            
+            cluster_info[cluster_idx] = cluster_topics
+        
+        return cluster_info
+
     def forward(self, indices, input, epoch_id=None):
         bow, contextual_emb = input[0], input[1]
         combined_x = torch.cat((bow, contextual_emb), dim=1)
